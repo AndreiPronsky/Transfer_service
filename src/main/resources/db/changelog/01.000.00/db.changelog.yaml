@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - include:
+      file: create-table-users.sql
+      relativeToChangelogFile: true
+  - include:
+      file: create-table-email_data.sql
+      relativeToChangelogFile: true
+  - include:
+      file: create-table-phone_data.sql
+      relativeToChangelogFile: true
+  - include:
+      file: create-table-accounts.sql
+      relativeToChangelogFile: true
+  - changeSet:
+      id: 01.000.00
+      author: Andrei Pronsky
+      logicalFilePath: 01.000.00/db.changelog.yml
+      changes:
+        - tagDatabase:
+            tag: 01.000.00

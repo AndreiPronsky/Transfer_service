@@ -23,7 +23,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "account")
+@Table(name = "accounts")
 public class Account {
 
     @Id
