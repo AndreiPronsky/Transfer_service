@@ -1,12 +1,16 @@
 package org.pronsky.transfer_service.service.dto.request;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -33,4 +37,8 @@ public class CreateUserRequestDto {
     @Email(message = "Email must be valid")
     @Size(max = 200, message = "Email must be less than or equal to 200 characters")
     private String email;
+
+    @NotNull(message = "Initial balance must not be null")
+    @DecimalMin(value = "0.01", message = "Initial balance must be at least 0.01")
+    private BigDecimal initialBalance;
 }
