@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.pronsky.transfer_service.service.UserService;
 import org.pronsky.transfer_service.service.dto.request.AddEmailToUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.AddPhoneToUserRequestDto;
+import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdateEmailRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdatePhoneRequestDto;
+import org.pronsky.transfer_service.service.dto.response.EmailDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PhoneDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
@@ -36,11 +38,11 @@ public class UserController {
 
     @GetMapping("/search")
     public ResponseEntity<PageableResponseDto<SingleUserResponseDto>> search(
-            @RequestParam(value = "q") String query,
+            @RequestBody @Valid SearchUserRequestDto requestDto,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "5") int size
     ) {
-        return ResponseEntity.ok(userService.getUsersFiltered(PageRequest.of(page - 1, size), query));
+        return ResponseEntity.ok(userService.searchUsers(PageRequest.of(page - 1, size), requestDto));
     }
 
     @GetMapping("show-phones/{userId}")
@@ -49,8 +51,8 @@ public class UserController {
     }
 
     @GetMapping("show-emails/{userId}")
-    public ResponseEntity<PhoneDataResponseDto> getUserEmails(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(userService.getPhoneNumbersByUserId(userId));
+    public ResponseEntity<EmailDataResponseDto> getUserEmails(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(userService.getEmailsByUserId(userId));
     }
 
     @PostMapping("/add-phone")
@@ -73,7 +75,7 @@ public class UserController {
 
     @PatchMapping("/edit-phone")
     public ResponseEntity<Void> updatePhone(@RequestBody @Valid UpdatePhoneRequestDto requestDto) {
-        userService.updateEmail(requestDto.getUserId(), requestDto.getPhoneId(), requestDto.getNewPhoneNumber());
+        userService.updatePhoneNumber(requestDto.getUserId(), requestDto.getPhoneId(), requestDto.getNewPhoneNumber());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
