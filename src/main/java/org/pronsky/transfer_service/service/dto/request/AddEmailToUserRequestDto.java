@@ -2,6 +2,8 @@ package org.pronsky.transfer_service.service.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +12,8 @@ import lombok.Getter;
 @Builder
 public class AddEmailToUserRequestDto {
 
+    @NotNull(message = "User ID must not be null")
+    @Positive(message = "User ID must be a positive number")
     private Long userId;
 
     @NotBlank(message = "Email must not be blank")
