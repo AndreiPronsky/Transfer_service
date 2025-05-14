@@ -1,12 +1,14 @@
 package org.pronsky.transfer_service.service;
 
+import org.pronsky.transfer_service.service.dto.EmailDataDto;
+import org.pronsky.transfer_service.service.dto.PhoneDataDto;
 import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
-import org.pronsky.transfer_service.service.dto.response.EmailDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
-import org.pronsky.transfer_service.service.dto.response.PhoneDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface UserService {
@@ -23,9 +25,9 @@ public interface UserService {
 
     void deletePhoneNumberFromUser(Long userId, Long phoneNumberId);
 
-    PhoneDataResponseDto getPhoneNumbersByUserId(Long userId);
+    List<PhoneDataDto> getPhoneNumbersByUserId(Long userId);
 
-    EmailDataResponseDto getEmailsByUserId(Long userId);
+    List<EmailDataDto> getEmailsByUserId(Long userId);
 
     PageableResponseDto<SingleUserResponseDto> searchUsers(Pageable pageable, SearchUserRequestDto searchDto);
 }

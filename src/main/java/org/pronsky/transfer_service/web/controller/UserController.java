@@ -4,14 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pronsky.transfer_service.service.UserService;
+import org.pronsky.transfer_service.service.dto.EmailDataDto;
+import org.pronsky.transfer_service.service.dto.PhoneDataDto;
 import org.pronsky.transfer_service.service.dto.request.AddEmailToUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.AddPhoneToUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdateEmailRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdatePhoneRequestDto;
-import org.pronsky.transfer_service.service.dto.response.EmailDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
-import org.pronsky.transfer_service.service.dto.response.PhoneDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -46,12 +48,12 @@ public class UserController {
     }
 
     @GetMapping("show-phones/{userId}")
-    public ResponseEntity<PhoneDataResponseDto> getUserPhones(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<PhoneDataDto>> getUserPhones(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(userService.getPhoneNumbersByUserId(userId));
     }
 
     @GetMapping("show-emails/{userId}")
-    public ResponseEntity<EmailDataResponseDto> getUserEmails(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<EmailDataDto>> getUserEmails(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(userService.getEmailsByUserId(userId));
     }
 
