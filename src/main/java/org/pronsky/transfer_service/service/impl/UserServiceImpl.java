@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.pronsky.transfer_service.data.entity.EmailData;
 import org.pronsky.transfer_service.data.entity.PhoneData;
 import org.pronsky.transfer_service.data.entity.User;
-import org.pronsky.transfer_service.data.repository.AccountRepository;
 import org.pronsky.transfer_service.data.repository.EmailDataRepository;
 import org.pronsky.transfer_service.data.repository.PhoneDataRepository;
 import org.pronsky.transfer_service.data.repository.UserRepository;
@@ -32,7 +31,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PhoneDataRepository phoneDataRepository;
     private final EmailDataRepository emailDataRepository;
-    private final AccountRepository accountRepository;
     private final EmailMapper emailMapper;
     private final PhoneMapper phoneMapper;
 
