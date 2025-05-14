@@ -1,5 +1,6 @@
 package org.pronsky.transfer_service.service;
 
+import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
 import org.pronsky.transfer_service.service.dto.response.EmailDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PhoneDataResponseDto;
@@ -16,7 +17,7 @@ public interface UserService {
 
     void updateEmail(Long userId, Long emailId, String email);
 
-    void updatePhoneNumberByUserId(Long userId, Long phoneNumberId, String phoneNumber);
+    void updatePhoneNumber(Long userId, Long phoneNumberId, String phoneNumber);
 
     void deleteEmailFromUser(Long userId, Long emailId);
 
@@ -26,5 +27,5 @@ public interface UserService {
 
     EmailDataResponseDto getEmailsByUserId(Long userId);
 
-    PageableResponseDto<SingleUserResponseDto> getUsersFiltered(Pageable pageable, String query);
+    PageableResponseDto<SingleUserResponseDto> searchUsers(Pageable pageable, SearchUserRequestDto searchDto);
 }
