@@ -1,18 +1,30 @@
 package org.pronsky.transfer_service.service;
 
-import org.pronsky.transfer_service.service.dto.request.CreateUserRequestDto;
-import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
-import org.pronsky.transfer_service.service.dto.request.UpdateUserRequestDto;
-import org.pronsky.transfer_service.service.dto.response.PageableUserResponseDto;
+import org.pronsky.transfer_service.service.dto.response.EmailDataResponseDto;
+import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
+import org.pronsky.transfer_service.service.dto.response.PhoneDataResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
 
-    SingleUserResponseDto createUser(CreateUserRequestDto createUserRequestDto);
+    void addEmailToUser(Long userId, String email);
 
-    SingleUserResponseDto updateUser(UpdateUserRequestDto updateUserRequestDto);
+    void addPhoneNumberToUser(Long userId, String phoneNumber);
 
-    PageableUserResponseDto findUsersFiltered(SearchUserRequestDto searchUserRequestDto);
+    void updateEmail(Long userId, Long emailId, String email);
+
+    void updatePhoneNumberByUserId(Long userId, Long phoneNumberId, String phoneNumber);
+
+    void deleteEmailFromUser(Long userId, Long emailId);
+
+    void deletePhoneNumberFromUser(Long userId, Long phoneNumberId);
+
+    PhoneDataResponseDto getPhoneNumbersByUserId(Long userId);
+
+    EmailDataResponseDto getEmailsByUserId(Long userId);
+
+    PageableResponseDto<SingleUserResponseDto> getUsersFiltered(Pageable pageable, String query);
 }
