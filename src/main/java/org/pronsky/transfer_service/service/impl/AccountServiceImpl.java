@@ -31,16 +31,16 @@ public class AccountServiceImpl implements AccountService {
     public void performTransfer(TransferRequestDto transferRequestDto) {
         checkSenderAndRecipientAccountIdentity(transferRequestDto);
 
-        Account senderAccount = accountRepository.findByIdForUpdate(transferRequestDto.getSenderAccountId())
+        Account senderAccount = accountRepository.findByUserForUpdate(transferRequestDto.getSenderId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(ACCOUNT_NOT_FOUND, transferRequestDto.getSenderAccountId()))
+                        String.format(ACCOUNT_NOT_FOUND, transferRequestDto.getSenderId()))
                 );
 
         checkBalance(senderAccount, transferRequestDto.getAmount());
 
-        Account recipientAccount = accountRepository.findByIdForUpdate(transferRequestDto.getRecipientAccountId())
+        Account recipientAccount = accountRepository.findByUserForUpdate(transferRequestDto.getRecipientId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(ACCOUNT_NOT_FOUND, transferRequestDto.getRecipientAccountId()))
+                        String.format(ACCOUNT_NOT_FOUND, transferRequestDto.getRecipientId()))
                 );
 
         senderAccount.setActualBalance(senderAccount.getActualBalance().subtract(transferRequestDto.getAmount()));
@@ -48,8 +48,8 @@ public class AccountServiceImpl implements AccountService {
 
         log.info(String.format(SUCCESSFUL_TRANSFER,
                 transferRequestDto.getAmount(),
-                transferRequestDto.getSenderAccountId(),
-                transferRequestDto.getRecipientAccountId())
+                transferRequestDto.getSenderId(),
+                transferRequestDto.getRecipientId())
         );
     }
 
@@ -62,8 +62,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void checkSenderAndRecipientAccountIdentity(TransferRequestDto transferRequestDto) {
-        Long senderAccountId = transferRequestDto.getSenderAccountId();
-        Long recipientAccountId = transferRequestDto.getRecipientAccountId();
+        Long senderAccountId = transferRequestDto.getSenderId();
+        Long recipientAccountId = transferRequestDto.getRecipientId();
         if (senderAccountId.equals(recipientAccountId)) {
             log.warn(SAME_SENDER_AND_RECIPIENT_ACCOUNT);
             throw new TransferException(SAME_SENDER_AND_RECIPIENT_ACCOUNT);

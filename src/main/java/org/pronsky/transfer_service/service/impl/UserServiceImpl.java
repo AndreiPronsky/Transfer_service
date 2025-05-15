@@ -2,6 +2,7 @@ package org.pronsky.transfer_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pronsky.transfer_service.data.entity.EmailData;
 import org.pronsky.transfer_service.data.entity.PhoneData;
 import org.pronsky.transfer_service.data.entity.User;
@@ -35,13 +36,21 @@ import static org.pronsky.transfer_service.service.specification.UserSpecificati
 import static org.pronsky.transfer_service.service.specification.UserSpecification.hasPhoneNumber;
 import static org.pronsky.transfer_service.service.specification.UserSpecification.nameLike;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private static final String USER_NOT_FOUND = "User with id %s not found";
+    private static final String EMAIL_ADDED_TO_USER = "Email {} added to user {}";
+    private static final String PHONE_NUMBER_ADDED_TO_USER = "Phone {} added to user {}";
+    private static final String EMAIL_UPDATED_FOR_USER = "Email {} updated for user {}";
+    private static final String PHONE_NUMBER_UPDATED_FOR_USER = "Phone {} updated for user {}";
+    private static final String DELETE_EMAIL_FROM_USER = "Email {} deleted for user {}";
+    private static final String DELETE_PHONE_NUMBER_FROM_USER = "Phone {} deleted for user {}";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
     private final UserRepository userRepository;
     private final PhoneDataRepository phoneDataRepository;
     private final EmailDataRepository emailDataRepository;
@@ -53,55 +62,63 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void addEmailToUser(Long userId, String email) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND, userId)));
+        User user = getUserById(userId);
         Set<EmailData> userEmails = emailDataRepository.findAllEmailDataByUserId(userId);
         userEmails.add(EmailData.builder()
                 .user(user)
                 .email(email)
                 .build());
+        log.info(EMAIL_ADDED_TO_USER, email, userId);
     }
+
 
     @Override
     @Transactional
     public void addPhoneNumberToUser(Long userId, String phoneNumber) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND, userId)));
+        User user = getUserById(userId);
         Set<PhoneData> userPhones = phoneDataRepository.findAllPhoneDataByUserId(userId);
         userPhones.add(PhoneData.builder()
                 .user(user)
                 .phone(phoneNumber)
                 .build());
+        log.info(PHONE_NUMBER_ADDED_TO_USER, phoneNumber, userId);
+    }
+
+    @Override
+    @Transactional
+    public void updatePhoneNumber(Long userId, Long phoneId, String phoneNumber) {
+        User user = getUserById(userId);
+        Set<PhoneData> userPhones = phoneDataRepository.findAllPhoneDataByUserId(phoneId);
+        userPhones.add(PhoneData.builder()
+                .user(user)
+                .phone(phoneNumber)
+                .build());
+        log.info(PHONE_NUMBER_UPDATED_FOR_USER, phoneNumber, userId);
     }
 
     @Override
     @Transactional
     public void updateEmail(Long userId, Long emailId, String email) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND, userId)));
+        User user = getUserById(userId);
         Set<EmailData> userEmails = emailDataRepository.findAllEmailDataByUserId(emailId);
         userEmails.add(EmailData.builder()
                 .user(user)
                 .email(email)
                 .build());
-    }
-
-    @Override
-    @Transactional
-    public void updatePhoneNumber(Long userId, Long phoneNumberId, String phoneNumber) {
-        PhoneData phoneData = phoneDataRepository.findByIdAndUserId(phoneNumberId, userId);
-        phoneData.setPhone(phoneNumber);
+        log.info(EMAIL_UPDATED_FOR_USER, email, userId);
     }
 
     @Override
     @Transactional
     public void deleteEmailFromUser(Long userId, Long emailId) {
+        log.info(DELETE_EMAIL_FROM_USER, emailId, userId);
         emailDataRepository.deleteByIdAndUserId(emailId, userId);
     }
 
     @Override
     @Transactional
     public void deletePhoneNumberFromUser(Long userId, Long phoneNumberId) {
+        log.info(DELETE_PHONE_NUMBER_FROM_USER, phoneNumberId, userId);
         phoneDataRepository.deleteByIdAndUserId(phoneNumberId, userId);
     }
 
@@ -141,5 +158,10 @@ public class UserServiceImpl implements UserService {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format, expected dd.MM.yyyy", e);
         }
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND, userId)));
     }
 }
