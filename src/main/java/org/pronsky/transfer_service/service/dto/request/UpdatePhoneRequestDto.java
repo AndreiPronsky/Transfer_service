@@ -1,5 +1,6 @@
 package org.pronsky.transfer_service.service.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "Data transfer object to store data for phone number update")
 public class UpdatePhoneRequestDto {
 
     @NotNull(message = "User ID must not be null")
