@@ -7,6 +7,6 @@ import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    SingleUserResponseDto entityToUserDataDto(User user);
+    SingleUserResponseDto entityToSingleUserResponseDto(User user);
 
 }

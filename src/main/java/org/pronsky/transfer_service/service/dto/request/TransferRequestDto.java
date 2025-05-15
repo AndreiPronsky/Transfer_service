@@ -15,11 +15,11 @@ public class TransferRequestDto {
 
     @NotNull(message = "Sender account ID must not be null")
     @Positive(message = "Sender account ID must be a positive number")
-    private Long transferFrom;
+    private Long senderAccountId;
 
     @NotNull(message = "Recipient account ID must not be null")
     @Positive(message = "Recipient account ID must be a positive number")
-    private Long transferTo;
+    private Long recipientAccountId;
 
     @NotNull(message = "Transfer amount must not be null")
     @DecimalMin(value = "0.01", message = "Transfer amount must be at least 0.01")
