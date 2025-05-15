@@ -13,5 +13,4 @@ public interface EmailDataRepository extends JpaRepository<EmailData, Long> {
 
     void deleteByIdAndUserId(Long id, Long userId);
 
-
 }
