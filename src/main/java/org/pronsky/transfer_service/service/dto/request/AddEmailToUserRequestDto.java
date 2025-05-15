@@ -1,5 +1,6 @@
 package org.pronsky.transfer_service.service.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
+@Schema(description = "Data transfer object to store data to add email to the specified user")
 public class AddEmailToUserRequestDto {
 
     @NotNull(message = "User ID must not be null")

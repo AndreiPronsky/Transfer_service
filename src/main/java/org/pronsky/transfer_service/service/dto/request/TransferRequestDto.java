@@ -1,5 +1,6 @@
 package org.pronsky.transfer_service.service.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Builder
+@Schema(description = "Data Transfer Object to perform a transfer between accounts")
 public class TransferRequestDto {
 
     @NotNull(message = "Sender account ID must not be null")
