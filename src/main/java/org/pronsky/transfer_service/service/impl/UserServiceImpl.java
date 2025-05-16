@@ -13,6 +13,8 @@ import org.pronsky.transfer_service.service.UserService;
 import org.pronsky.transfer_service.service.dto.EmailDataDto;
 import org.pronsky.transfer_service.service.dto.PhoneDataDto;
 import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
+import org.pronsky.transfer_service.service.dto.request.UpdateEmailRequestDto;
+import org.pronsky.transfer_service.service.dto.request.UpdatePhoneRequestDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
 import org.pronsky.transfer_service.service.mapper.EmailMapper;
@@ -30,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.pronsky.transfer_service.service.specification.UserSpecification.hasDateOfBirthAfter;
 import static org.pronsky.transfer_service.service.specification.UserSpecification.hasEmail;
@@ -49,6 +52,8 @@ public class UserServiceImpl implements UserService {
     private static final String PHONE_NUMBER_UPDATED_FOR_USER = "Phone {} updated for user {}";
     private static final String DELETE_EMAIL_FROM_USER = "Email {} deleted for user {}";
     private static final String DELETE_PHONE_NUMBER_FROM_USER = "Phone {} deleted for user {}";
+    private static final String EMAIL_DOES_NOT_BELONG_TO_USER = "Email %s does not belong to user %s";
+    private static final String PHONE_DOES_NOT_BELONG_TO_USER = "Phone number %s does not belong to user %s";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private final UserRepository userRepository;
@@ -63,11 +68,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addEmailToUser(Long userId, String email) {
         User user = getUserById(userId);
-        Set<EmailData> userEmails = emailDataRepository.findAllEmailDataByUserId(userId);
-        userEmails.add(EmailData.builder()
+        EmailData emailData = EmailData.builder()
                 .user(user)
                 .email(email)
-                .build());
+                .build();
+        emailDataRepository.save(emailData);
         log.info(EMAIL_ADDED_TO_USER, email, userId);
     }
 
@@ -76,41 +81,51 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addPhoneNumberToUser(Long userId, String phoneNumber) {
         User user = getUserById(userId);
-        Set<PhoneData> userPhones = phoneDataRepository.findAllPhoneDataByUserId(userId);
-        userPhones.add(PhoneData.builder()
+        PhoneData phoneData = (PhoneData.builder()
                 .user(user)
-                .phone(phoneNumber)
+                .phoneNumber(phoneNumber)
                 .build());
+        phoneDataRepository.save(phoneData);
         log.info(PHONE_NUMBER_ADDED_TO_USER, phoneNumber, userId);
     }
 
     @Override
     @Transactional
-    public void updatePhoneNumber(Long userId, Long phoneId, String phoneNumber) {
+    public void updatePhoneNumber(UpdatePhoneRequestDto dto) {
+        Long phoneId = dto.getPhoneId();
+        Long userId = dto.getUserId();
         User user = getUserById(userId);
-        Set<PhoneData> userPhones = phoneDataRepository.findAllPhoneDataByUserId(phoneId);
-        userPhones.add(PhoneData.builder()
-                .user(user)
-                .phone(phoneNumber)
-                .build());
-        log.info(PHONE_NUMBER_UPDATED_FOR_USER, phoneNumber, userId);
+        PhoneData phoneData = phoneDataRepository.findById(phoneId)
+                .orElseThrow(EntityNotFoundException::new);
+        if (!user.equals(phoneData.getUser())) {
+            throw new SecurityException(
+                    String.format(PHONE_DOES_NOT_BELONG_TO_USER, phoneId, userId));
+        }
+        phoneData.setPhoneNumber(dto.getNewPhoneNumber());
+        phoneDataRepository.save(phoneData);
+        log.info(PHONE_NUMBER_UPDATED_FOR_USER, dto.getNewPhoneNumber(), userId);
     }
 
     @Override
     @Transactional
-    public void updateEmail(Long userId, Long emailId, String email) {
+    public void updateEmail(UpdateEmailRequestDto dto) {
+        Long emailId = dto.getEmailId();
+        Long userId = dto.getUserId();
         User user = getUserById(userId);
-        Set<EmailData> userEmails = emailDataRepository.findAllEmailDataByUserId(emailId);
-        userEmails.add(EmailData.builder()
-                .user(user)
-                .email(email)
-                .build());
-        log.info(EMAIL_UPDATED_FOR_USER, email, userId);
+        EmailData emailData = emailDataRepository.findById(emailId)
+                .orElseThrow(EntityNotFoundException::new);
+        if (!user.equals(emailData.getUser())) {
+            throw new SecurityException(
+                    String.format(EMAIL_DOES_NOT_BELONG_TO_USER, emailId, userId));
+        }
+        emailData.setEmail(dto.getNewEmail());
+        emailDataRepository.save(emailData);
+        log.info(EMAIL_UPDATED_FOR_USER, dto.getNewEmail(), dto.getUserId());
     }
 
     @Override
     @Transactional
-    public void deleteEmailFromUser(Long userId, Long emailId) {
+    public void deleteEmail(Long userId, Long emailId) {
         log.info(DELETE_EMAIL_FROM_USER, emailId, userId);
         emailDataRepository.deleteByIdAndUserId(emailId, userId);
     }
@@ -125,7 +140,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageableResponseDto<SingleUserResponseDto> searchUsers(Pageable pageable, SearchUserRequestDto searchDto) {
 
-        Specification<User> specification = hasDateOfBirthAfter(parseDate(searchDto.getDateOfBirth()))
+        LocalDate dateOfBirth = searchDto.getDateOfBirth() == null ? null : parseDate(searchDto.getDateOfBirth());
+
+        Specification<User> specification = hasDateOfBirthAfter(dateOfBirth)
                 .and(hasEmail(searchDto.getEmail()))
                 .and(hasPhoneNumber(searchDto.getPhone()))
                 .and(nameLike(searchDto.getName()));
@@ -139,17 +156,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<PhoneDataDto> getPhoneNumbersByUserId(Long userId) {
+    public Set<PhoneDataDto> getPhoneNumbersByUserId(Long userId) {
         return phoneDataRepository.findAllPhoneDataByUserId(userId).stream()
-                .map(phoneMapper::phoneDataEntityToPhoneDataResponseDto)
-                .toList();
+                .map(phoneMapper::phoneDataEntityToPhoneDataDto)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public List<EmailDataDto> getEmailsByUserId(Long userId) {
+    public Set<EmailDataDto> getEmailsByUserId(Long userId) {
         return emailDataRepository.findAllEmailDataByUserId(userId).stream()
                 .map(emailMapper::emailDataEntityToEmailDataResponseDto)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     private LocalDate parseDate(String date) {

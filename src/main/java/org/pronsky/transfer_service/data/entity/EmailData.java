@@ -27,13 +27,14 @@ public class EmailData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = 200, nullable = false, unique = true)
+    @Column(name = "email", length = 200, nullable = false, unique = true)
     private String email;
 
     @Override

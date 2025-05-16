@@ -12,5 +12,4 @@ public interface EmailDataRepository extends JpaRepository<EmailData, Long> {
     Set<EmailData> findAllEmailDataByUserId(Long userId);
 
     void deleteByIdAndUserId(Long id, Long userId);
-
 }

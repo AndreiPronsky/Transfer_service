@@ -19,10 +19,10 @@ import java.math.BigDecimal;
 @Transactional(readOnly = true)
 public class AccountServiceImpl implements AccountService {
 
-    private static final String INSUFFICIENT_BALANCE = "Insufficient Balance on account %s";
+    private static final String INSUFFICIENT_BALANCE = "Insufficient Balance on account {}";
     private static final String SAME_SENDER_AND_RECIPIENT_ACCOUNT = "Same Sender and Recipient Account";
     private static final String ACCOUNT_NOT_FOUND = "Account %s not found";
-    private static final String SUCCESSFUL_TRANSFER = "Transfer in the amount of %s from %s to %s successfully handled";
+    private static final String SUCCESSFUL_TRANSFER = "Transfer in the amount of {} from {} to {} successfully handled";
 
     private final AccountRepository accountRepository;
 
@@ -46,18 +46,19 @@ public class AccountServiceImpl implements AccountService {
         senderAccount.setActualBalance(senderAccount.getActualBalance().subtract(transferRequestDto.getAmount()));
         recipientAccount.setActualBalance(recipientAccount.getActualBalance().add(transferRequestDto.getAmount()));
 
-        log.info(String.format(SUCCESSFUL_TRANSFER,
+        log.info(SUCCESSFUL_TRANSFER,
                 transferRequestDto.getAmount(),
                 transferRequestDto.getSenderId(),
-                transferRequestDto.getRecipientId())
+                transferRequestDto.getRecipientId()
         );
     }
 
     private void checkBalance(Account senderAccount, BigDecimal amount) {
         BigDecimal balance = senderAccount.getActualBalance();
         if (balance.compareTo(amount) < 0) {
-            log.warn(String.format(INSUFFICIENT_BALANCE, senderAccount.getId()));
-            throw new TransferException(String.format(INSUFFICIENT_BALANCE, senderAccount.getId()));
+            String message = String.format("Insufficient Balance on account %d", senderAccount.getId());
+            log.warn(message);
+            throw new TransferException(message);
         }
     }
 

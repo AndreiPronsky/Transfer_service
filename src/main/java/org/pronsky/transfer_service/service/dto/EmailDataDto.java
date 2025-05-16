@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class EmailDataDto {
 
-    private Long emailId;
+    private Long id;
     private String email;
 }

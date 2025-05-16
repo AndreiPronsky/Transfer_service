@@ -27,14 +27,15 @@ public class PhoneData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = 13, nullable = false, unique = true)
-    private String phone;
+    @Column(name = "phone", length = 13, nullable = false, unique = true)
+    private String phoneNumber;
 
     @Override
     public boolean equals(Object o) {
@@ -53,7 +54,7 @@ public class PhoneData {
     public String toString() {
         return "PhoneData{" +
                 "id=" + id +
-                ", phone='" + phone + '\'' +
+                ", phone='" + phoneNumber + '\'' +
                 '}';
     }
 }

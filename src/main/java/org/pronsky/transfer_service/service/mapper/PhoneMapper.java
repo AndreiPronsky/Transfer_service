@@ -7,5 +7,6 @@ import org.pronsky.transfer_service.service.dto.PhoneDataDto;
 @Mapper(componentModel = "spring")
 public interface PhoneMapper {
 
-    PhoneDataDto phoneDataEntityToPhoneDataResponseDto(PhoneData phoneData);
+    PhoneDataDto phoneDataEntityToPhoneDataDto(PhoneData phoneData);
+
 }
