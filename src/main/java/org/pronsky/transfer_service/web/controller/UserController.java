@@ -173,7 +173,7 @@ public class UserController {
                     @ApiResponse(responseCode = "201", description = "`Phone number successfully added`",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema())
-                   ),
+                    ),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ExceptionResponseDto.class))),

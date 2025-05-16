@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
     private static final String EMAIL_DOES_NOT_BELONG_TO_USER = "Email %s does not belong to user %s";
     private static final String PHONE_DOES_NOT_BELONG_TO_USER = "Phone number %s does not belong to user %s";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    public static final String EMAIL_WITH_ID_NOT_FOUND = "Email with ID %s not found";
 
     private final UserRepository userRepository;
     private final PhoneDataRepository phoneDataRepository;
@@ -127,7 +128,26 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteEmail(Long userId, Long emailId) {
         log.info(DELETE_EMAIL_FROM_USER, emailId, userId);
-        emailDataRepository.deleteByIdAndUserId(emailId, userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND, userId)));
+        EmailData emailToDelete = emailDataRepository.findById(emailId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(EMAIL_WITH_ID_NOT_FOUND, emailId)));
+        Set<EmailData> emails = emailDataRepository.findAllEmailDataByUserId(userId);
+
+        if (emails.size() <= 1) {
+            log.warn("Attempt to delete the only email {}", emailId);
+            throw new IllegalArgumentException("Cannot delete the only email of the user");
+        }
+
+        if (emailToDelete.getEmail().equals(user.getPrimaryEmail())) {
+            EmailData newPrimaryEmail = emails.stream()
+                    .filter(email -> !email.getId().equals(emailId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("No other email to set as primary"));
+            user.setPrimaryEmail(newPrimaryEmail.getEmail());
+        }
+        emailDataRepository.delete(emailToDelete);
     }
 
     @Override
