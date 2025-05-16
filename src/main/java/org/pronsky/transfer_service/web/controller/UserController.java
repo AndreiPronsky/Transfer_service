@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -54,6 +54,11 @@ public class UserController {
             parameters = {
                     @Parameter(name = "page", description = "Page number, starts from 1", example = "1"),
                     @Parameter(name = "size", description = "Number of elements on the page", example = "10"),
+                    @Parameter(name = "dateOfBirth", description = "Parameter to search users by date of birth " +
+                            "(greater than provided"),
+                    @Parameter(name = "phone", description = "Parameter to search users by phone number (100% match)"),
+                    @Parameter(name = "name", description = "Parameter to search users by name (partial match)"),
+                    @Parameter(name = "email", description = "Parameter to search users by email (100% match)")
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true,
                     content = @Content(mediaType = "application/json",
@@ -71,10 +76,19 @@ public class UserController {
     })
     @GetMapping("/search")
     public ResponseEntity<PageableResponseDto<SingleUserResponseDto>> search(
-            @RequestBody @Valid SearchUserRequestDto requestDto,
+            @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "5") int size
     ) {
+        SearchUserRequestDto requestDto = SearchUserRequestDto.builder()
+                .dateOfBirth(dateOfBirth)
+                .phone(phone)
+                .name(name)
+                .email(email)
+                .build();
         return ResponseEntity.ok(userService.searchUsers(PageRequest.of(page - 1, size), requestDto));
     }
 
@@ -102,7 +116,7 @@ public class UserController {
                             schema = @Schema())),
     })
     @GetMapping("/phones/{userId}")
-    public ResponseEntity<List<PhoneDataDto>> getUserPhones(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Set<PhoneDataDto>> getUserPhones(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(userService.getPhoneNumbersByUserId(userId));
     }
 
@@ -130,7 +144,7 @@ public class UserController {
                             schema = @Schema())),
     })
     @GetMapping("/emails/{userId}")
-    public ResponseEntity<List<EmailDataDto>> getUserEmails(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Set<EmailDataDto>> getUserEmails(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(userService.getEmailsByUserId(userId));
     }
 
@@ -241,7 +255,7 @@ public class UserController {
     )
     @PatchMapping("/edit-email")
     public ResponseEntity<Void> updateEmail(@RequestBody @Valid UpdateEmailRequestDto requestDto) {
-        userService.updateEmail(requestDto.getUserId(), requestDto.getEmailId(), requestDto.getNewEmail());
+        userService.updateEmail(requestDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
@@ -278,7 +292,7 @@ public class UserController {
     )
     @PatchMapping("/edit-phone")
     public ResponseEntity<Void> updatePhone(@RequestBody @Valid UpdatePhoneRequestDto requestDto) {
-        userService.updatePhoneNumber(requestDto.getUserId(), requestDto.getPhoneId(), requestDto.getNewPhoneNumber());
+        userService.updatePhoneNumber(requestDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
@@ -314,7 +328,7 @@ public class UserController {
             }
     )
     @DeleteMapping("/{userId}/delete-phone/{phoneId}")
-    public ResponseEntity<Void> deletePhoneByIdByUserId(
+    public ResponseEntity<Void> deletePhoneByIdAndUserId(
             @PathVariable("userId") Long userId,
             @PathVariable("phoneId") Long phoneId
     ) {
@@ -354,11 +368,11 @@ public class UserController {
             }
     )
     @DeleteMapping("{userId}/delete-email/{emailId}")
-    public ResponseEntity<Void> deleteEmailByIdByUserId(
+    public ResponseEntity<Void> deleteEmailByIdAndUserId(
             @PathVariable("userId") Long userId,
             @PathVariable("emailId") Long emailId
     ) {
-        userService.deleteEmailFromUser(userId, emailId);
+        userService.deleteEmail(userId, emailId);
         return ResponseEntity.noContent().build();
     }
 }

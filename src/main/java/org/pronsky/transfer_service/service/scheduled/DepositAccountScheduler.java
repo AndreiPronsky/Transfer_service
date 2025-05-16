@@ -22,20 +22,20 @@ public class DepositAccountScheduler {
         List<Account> accounts = accountRepository.findAll();
 
         accounts.forEach(account -> {
-                    BigDecimal initialBalance = account.getInitialBalance();
-                    BigDecimal actualBalance = account.getActualBalance();
+            BigDecimal initialBalance = account.getInitialBalance();
+            BigDecimal actualBalance = account.getActualBalance();
+            BigDecimal maxAllowedBalance = initialBalance.multiply(BigDecimal.valueOf(2.07));
 
-                    BigDecimal maxAllowedBalance = initialBalance.multiply(BigDecimal.valueOf(2.07));
+            if (actualBalance.compareTo(maxAllowedBalance) < 0) {
+                BigDecimal renewedBalance = actualBalance.multiply(BigDecimal.valueOf(1.1));
 
-                    if (actualBalance.compareTo(maxAllowedBalance) < 0) {
-                        BigDecimal renewedBalance = actualBalance.multiply(BigDecimal.valueOf(1.1));
-                        account.setActualBalance(renewedBalance);
-                        if (actualBalance.compareTo(maxAllowedBalance) > 0) {
-                            account.setActualBalance(maxAllowedBalance);
-                        }
-                    }
+                if (renewedBalance.compareTo(maxAllowedBalance) > 0) {
+                    renewedBalance = maxAllowedBalance;
                 }
-        );
+
+                account.setActualBalance(renewedBalance);
+            }
+        });
 
     }
 }

@@ -11,7 +11,5 @@ public interface PhoneDataRepository extends JpaRepository<PhoneData, Long> {
 
     Set<PhoneData> findAllPhoneDataByUserId(Long userId);
 
-    PhoneData findByIdAndUserId(Long phoneNumberId, Long userId);
-
     void deleteByIdAndUserId(Long phoneNumberId, Long userId);
 }
