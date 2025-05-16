@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pronsky.transfer_service.service.AccountService;
 import org.pronsky.transfer_service.service.dto.request.TransferRequestDto;
+import org.pronsky.transfer_service.service.dto.response.ExceptionResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,13 +43,16 @@ public class AccountController {
                             schema = @Schema())),
             @ApiResponse(responseCode = "400", description = "'Bad Request'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "'User Not Found'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "'Internal Server Error'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
     })
     @PostMapping("/transfer")
     public ResponseEntity<Void> performTransfer(@RequestBody @Valid TransferRequestDto request) {

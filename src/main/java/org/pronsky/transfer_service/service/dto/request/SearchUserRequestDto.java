@@ -6,11 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
-import org.pronsky.transfer_service.util.validation.AtLeastOneField;
 
 @Getter
 @Builder
-@AtLeastOneField //Custom validation annotation
 @Schema(description = "Data Transfer Object to store parameters for user search")
 public class SearchUserRequestDto {
 

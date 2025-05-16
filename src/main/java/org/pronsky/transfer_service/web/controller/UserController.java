@@ -17,6 +17,7 @@ import org.pronsky.transfer_service.service.dto.request.AddPhoneToUserRequestDto
 import org.pronsky.transfer_service.service.dto.request.SearchUserRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdateEmailRequestDto;
 import org.pronsky.transfer_service.service.dto.request.UpdatePhoneRequestDto;
+import org.pronsky.transfer_service.service.dto.response.ExceptionResponseDto;
 import org.pronsky.transfer_service.service.dto.response.PageableResponseDto;
 import org.pronsky.transfer_service.service.dto.response.SingleUserResponseDto;
 import org.springframework.data.domain.PageRequest;
@@ -69,10 +70,13 @@ public class UserController {
                             schema = @Schema(implementation = PageableResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "'Bad Request'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "'Internal Server Error'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
     })
     @GetMapping("/search")
     public ResponseEntity<PageableResponseDto<SingleUserResponseDto>> search(
@@ -107,13 +111,16 @@ public class UserController {
                             schema = @Schema(implementation = PageableResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "'Bad Request'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "'User Not Found'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "'Internal Server Error'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
     })
     @GetMapping("/phones/{userId}")
     public ResponseEntity<Set<PhoneDataDto>> getUserPhones(@PathVariable("userId") Long userId) {
@@ -135,13 +142,16 @@ public class UserController {
                             schema = @Schema(implementation = PageableResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "'Bad Request'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "'User Not Found'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "'Internal Server Error'",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())),
+                            schema = @Schema(implementation = ExceptionResponseDto.class))),
     })
     @GetMapping("/emails/{userId}")
     public ResponseEntity<Set<EmailDataDto>> getUserEmails(@PathVariable("userId") Long userId) {
@@ -158,24 +168,24 @@ public class UserController {
                     """,
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true,
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AddPhoneToUserRequestDto.class))
-            ),
+                            schema = @Schema(implementation = AddPhoneToUserRequestDto.class))),
             responses = {
                     @ApiResponse(responseCode = "201", description = "`Phone number successfully added`",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema())
-                    ),
+                   ),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))
                     )
             }
     )
@@ -200,20 +210,19 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "201", description = "`Email successfully added`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema())),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    )
+                                    schema = @Schema(implementation = ExceptionResponseDto.class)))
             }
     )
     @PostMapping("/add-email")
@@ -237,19 +246,19 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "202", description = "`Email successfully updated`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema())),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))
                     )
             }
     )
@@ -274,19 +283,19 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "202", description = "`Phone number successfully updated`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema())),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))
                     )
             }
     )
@@ -311,19 +320,19 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "204", description = "`Phone number successfully deleted`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema())),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))
                     )
             }
     )
@@ -351,19 +360,19 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "204", description = "`Email successfully deleted`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema())),
                     @ApiResponse(responseCode = "400", description = "`Bad Request`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "'Forbidden'",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "`User Not Found`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
-                    ),
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))),
                     @ApiResponse(responseCode = "500", description = "`Internal Server Error`",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema())
+                                    schema = @Schema(implementation = ExceptionResponseDto.class))
                     )
             }
     )
