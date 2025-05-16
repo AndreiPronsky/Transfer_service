@@ -12,6 +12,7 @@ import org.pronsky.transfer_service.data.entity.User;
 import org.pronsky.transfer_service.data.repository.AccountRepository;
 import org.pronsky.transfer_service.service.dto.request.TransferRequestDto;
 import org.pronsky.transfer_service.service.exception.TransferException;
+import org.pronsky.transfer_service.service.security.UserSecurityService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,9 +28,13 @@ class AccountServiceImplTest {
     @Mock
     private AccountRepository accountRepository;
 
+    @Mock
+    private UserSecurityService userSecurityService;
+
     @InjectMocks
     private AccountServiceImpl accountService;
 
+    private User currentUser;
     private Account senderAccount;
     private Account recipientAccount;
 
@@ -46,6 +51,9 @@ class AccountServiceImplTest {
                 .dateOfBirth(LocalDate.of(2008, 11, 4))
                 .name("Valera")
                 .password("password")
+                .build();
+        currentUser = User.builder()
+                .id(1L)
                 .build();
         senderAccount = Account.builder()
                 .id(1L)
@@ -67,6 +75,7 @@ class AccountServiceImplTest {
                 .amount(new BigDecimal("25.00"))
                 .build();
 
+        when(userSecurityService.getCurrentUser()).thenReturn(currentUser);
         when(accountRepository.findByUserForUpdate(1L)).thenReturn(Optional.of(senderAccount));
         when(accountRepository.findByUserForUpdate(2L)).thenReturn(Optional.of(recipientAccount));
 
@@ -78,12 +87,14 @@ class AccountServiceImplTest {
 
     @Test
     void shouldThrowWhenSenderAndRecipientAreSame() {
+
         TransferRequestDto dto = TransferRequestDto.builder()
                 .senderId(1L)
                 .recipientId(1L)
                 .amount(new BigDecimal("25.00"))
                 .build();
 
+        when(userSecurityService.getCurrentUser()).thenReturn(currentUser);
         TransferException ex = assertThrows(TransferException.class, () -> accountService.performTransfer(dto));
         assertEquals("Same Sender and Recipient Account", ex.getMessage());
     }
@@ -95,7 +106,7 @@ class AccountServiceImplTest {
                 .recipientId(2L)
                 .amount(new BigDecimal("25.00"))
                 .build();
-
+        when(userSecurityService.getCurrentUser()).thenReturn(currentUser);
         when(accountRepository.findByUserForUpdate(1L)).thenReturn(Optional.empty());
 
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> accountService.performTransfer(dto));
@@ -109,7 +120,7 @@ class AccountServiceImplTest {
                 .recipientId(2L)
                 .amount(new BigDecimal("25.00"))
                 .build();
-
+        when(userSecurityService.getCurrentUser()).thenReturn(currentUser);
         when(accountRepository.findByUserForUpdate(1L)).thenReturn(Optional.of(senderAccount));
         when(accountRepository.findByUserForUpdate(2L)).thenReturn(Optional.empty());
 
@@ -124,7 +135,7 @@ class AccountServiceImplTest {
                 .recipientId(2L)
                 .amount(new BigDecimal("200.00"))
                 .build();
-
+        when(userSecurityService.getCurrentUser()).thenReturn(currentUser);
         when(accountRepository.findByUserForUpdate(1L)).thenReturn(Optional.of(senderAccount));
 
         TransferException transferException = assertThrows(
