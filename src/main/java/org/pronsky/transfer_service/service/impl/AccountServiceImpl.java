@@ -8,6 +8,7 @@ import org.pronsky.transfer_service.data.repository.AccountRepository;
 import org.pronsky.transfer_service.service.AccountService;
 import org.pronsky.transfer_service.service.dto.request.TransferRequestDto;
 import org.pronsky.transfer_service.service.exception.TransferException;
+import org.pronsky.transfer_service.service.security.UserSecurityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +20,23 @@ import java.math.BigDecimal;
 @Transactional(readOnly = true)
 public class AccountServiceImpl implements AccountService {
 
-    private static final String INSUFFICIENT_BALANCE = "Insufficient Balance on account {}";
     private static final String SAME_SENDER_AND_RECIPIENT_ACCOUNT = "Same Sender and Recipient Account";
     private static final String ACCOUNT_NOT_FOUND = "Account %s not found";
     private static final String SUCCESSFUL_TRANSFER = "Transfer in the amount of {} from {} to {} successfully handled";
+    private static final String ACCESS_DENIED = "Access denied";
 
     private final AccountRepository accountRepository;
+    private final UserSecurityService userSecurityService;
 
     @Override
     @Transactional
     public void performTransfer(TransferRequestDto transferRequestDto) {
+
+        Long currentUserId = userSecurityService.getCurrentUser().getId();
+        if (!currentUserId.equals(transferRequestDto.getSenderId())) {
+            throw new SecurityException(ACCESS_DENIED);
+        }
+
         checkSenderAndRecipientAccountIdentity(transferRequestDto);
 
         Account senderAccount = accountRepository.findByUserForUpdate(transferRequestDto.getSenderId())
