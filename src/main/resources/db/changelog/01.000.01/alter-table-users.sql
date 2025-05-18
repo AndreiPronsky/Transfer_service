@@ -1,0 +1,3 @@
+ALTER TABLE users
+    ADD COLUMN role          VARCHAR(20)         NOT NULL DEFAULT 'ROLE_USER',
+    ADD COLUMN primary_email VARCHAR(500) UNIQUE NOT NULL DEFAULT '';
